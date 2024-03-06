@@ -1,7 +1,7 @@
 // server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const Food = require('./models/Food');
+const FoodModel = require('./models/Food');
 const cors = require('cors')
 
 const app = express();
@@ -19,9 +19,9 @@ app.post('/insert', async (req, resp) => {
     const foodName = req.body.foodName
     const daysSinceIAte = req.body.daysSinceIAte
 
-    const food = new Food({ foodName:foodName, daysSinceIAte: daysSinceIAte });
+    const foodModel = new FoodModel({ foodName:foodName, daysSinceIAte: daysSinceIAte });
     try {
-        const savedFood = await food.save();
+        const savedFood = await foodModel.save();
         console.log("resposta:", savedFood)
         resp.send(savedFood);
     } catch (error) {
@@ -30,13 +30,35 @@ app.post('/insert', async (req, resp) => {
     }
 });
 
+app.delete('/delete/:id', async (req, res) =>{
+
+const id = req.params.id
+
+await FoodModel.findOneAndDelete(id).exec()
+res.send("Item deletado" )
+})
 
 app.get('/read', async (req, res) => {
     try {
-        const result = await Food.find({});
+        const result = await FoodModel.find({});
         res.send(result);
     } catch (error) {
         res.status(500).send(error);
+    }
+});
+
+app.put('/update', async (req, res) => {
+    const newFood = req.body.newFood
+    const id = req.body.id
+    
+    try {
+      const updateFood = await FoodModel.findById(id);
+      updateFood.foodName = newFood;
+      await updateFood.save();
+      res.status(200).send('Alimento atualizado com sucesso.');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Erro ao salvar o alimento.');
     }
 });
 
