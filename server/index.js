@@ -30,6 +30,16 @@ app.post('/insert', async (req, resp) => {
     }
 });
 
+
+app.get('/read', async (req, res) => {
+    try {
+        const result = await Food.find({});
+        res.send(result);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
 const PORT = process.env.PORT || 3001; 
 
 app.listen(PORT, () => {
